@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+
+<div class="container">
+	<h1 class="text-center">Edit your Poll</h1>
+	<div class="row">
+		<div class="col-md-6 offset-md-3">
+			
+			<form action="" method="post">
+			{% csrf_token %}		
+			{% for field in form %}
+    			
+				<div class="form-group">
+					{{ field.label_tag }}
+					{{ field }}
+					{{ field.errors }}
+				</div>
+
+			{% endfor %}
+			<button type="submit" class="btn btn-primary">Submit</button>
+
+			<a href="{% url 'polls:add_choice' poll.id %}" class="btn btn-warning">Add Choice <i class="fas fa-plus"></i></a>
+			
+			<a href="{% url 'polls:delete_poll_confirm' poll.id %}" class="btn btn-danger">
+				<i class="far fa-trash-alt"></i>Delete	
+			</a>
+
+
+			<h3 class="text-center">Choices</h3>
+
+			{% if messages %}
+				
+				    {% for message in messages %}
+				    <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+				    {{ message }}
+				    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    				<span aria-hidden="true">&times;</span>
+  					</button>
+					</div>
+				    
+				    {% endfor %}
+				
+			{% endif %}
+
+			{% for choice in poll.choice_set.all %}
+				<div class="list-group-item">
+					<label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label>
+					<a href="{% url 'polls:edit_choice' choice.id %}" class="float-right"><i class="far fa-edit"></i></a>
+
+				</div>	
+					
+				{% endfor %}
+
+			</form>
+		</div>
+	</div>
+</div> 
+
+{% endblock %}

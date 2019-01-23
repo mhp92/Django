@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+
+{% load static %}
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+
+
+{% block extra_head %}
+
+<script 
+	defer src="https://use.fontawesome.com/releases/v5.6.3/js/all.js" 
+	integrity="sha384-EIHISlAOj4zgYieurP0SdoiBYfGJKkgWedPHH4jCzpCXLmzVsw1ouK59MuUtP4a1" 
+	crossorigin="anonymous">
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+	<h1 class="text-center">Welcome to the Polls Lists</h1>
+	<div class="row">
+		<div class="col-md-8 offset-md-2">
+
+
+			<!-- Error/Success Message -->
+
+			{% if messages %}
+				
+				    {% for message in messages %}
+				    <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+				    {{ message }}
+				    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    				<span aria-hidden="true">&times;</span>
+  					</button>
+					</div>
+				    
+				    {% endfor %}
+				
+			{% endif %}
+
+			<!-- Filter Buttons -->
+			<!-- A-Z -->
+
+			<a 
+				href="?text=True" 
+				class="btn btn-{% if 'text' in request.GET %}warning{% else %}primary{% endif %}">A-Z
+				
+			</a>
+			
+			<!-- ordered by date created -->
+
+			<a 
+				href="?pub_date=True" 
+				class="btn btn-{% if 'pub_date' in request.GET %}warning{% else %}primary{% endif %}">pub date 
+				
+			</a>
+			
+			<!-- ordered by number of votes -->
+
+			<a 
+				href="?num_votes=True" 
+				class="btn btn-{% if 'num_votes' in request.GET %}warning{% else %}primary{% endif %}">Votes
+				
+			</a>
+
+
+
+			<!-- Add Button -->
+
+			<a href="{% url 'polls:add_poll' %}" class="btn btn-primary">Add <i class="fas fa-plus"></i></a>
+			
+			<!-- my_polls button -->
+			
+			<a href="{% url 'polls:my_polls' %}" class="btn btn-primary">My Polls</a>
+			
+
+			<!-- Pagination -->
+
+			<div class="pagination">
+			    <span class="step-links">
+			        {% if polls.has_previous %}
+			            <a href="?page=1&{{params}}" class=" btn btn-primary btn-sm"><i class="fas fa-angle-double-left"></i></a>
+			            <a href="?page={{ polls.previous_page_number }}&{{params}}" class=" btn btn-primary btn-sm"><i class="fas fa-angle-left"></i></a>
+					{% else %}
+						 <a href="" class=" btn btn-secondary btn-sm"><i class="fas fa-angle-double-left"></i></a>
+			            <a href="" class=" btn btn-secondary btn-sm"><i class="fas fa-angle-left"></i></a>
+					{% endif %}
+
+			        <span class="current">
+			            {{ polls.number }} / {{ polls.paginator.num_pages }}
+			        </span>
+
+			        {% if polls.has_next %}
+			            <a href="?page={{ polls.next_page_number }}&{{params}}" class=" btn btn-primary btn-sm"><i class="fas fa-angle-right"></i></a>
+			            <a href="?page={{ polls.paginator.num_pages }}&{{params}}" class=" btn btn-primary btn-sm"><i class="fas fa-angle-double-right"></i></a>
+			        {% else %}
+			            <a href="" class=" btn btn-secondary btn-sm"><i class="fas fa-angle-right"></i></a>
+			            <a href="" class=" btn btn-secondary btn-sm"><i class="fas fa-angle-double-right"></i></a>
+					{% endif %}
+			    </span>
+			</div>
+
+
+			
+			<!-- Search bar -->
+
+			<form class="form-inline">
+    			<input 
+    				class="form-control mr-sm-2" 
+    				type="search" 
+    				placeholder="Search" 
+    				aria-label="Search"
+    				name="search"
+    				value="{{search_term}}">
+    			<button class="btn btn-outline-primary my-2 my-sm-2" type="submit">Search</button>
+  			</form>
+
+			<!-- Polls List -->
+
+			<ul class="list-group">
+				{% for poll in polls %}
+
+					<li class="list-group-item">
+						<a href="{% url 'polls:detail' poll.id %}"">{{ poll }}</a>
+						{% if request.user == poll.owner %}
+						<a href="{% url 'polls:edit_poll' poll.id %}" class="float-right"><i class="far fa-edit"></i></a>
+						{% endif %}
+						{% if request.user != poll.owner %}
+						<div class="float-right">{{poll.owner}}</div>
+						{% endif %}
+					</li>
+				{% endfor %}
+			</ul>
+
+		
+
+		</div>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="container">
+	<h1 class="text-center">{{poll}} - {{poll.num_votes}} Vote(s)</h1>
+
+	
+	
+	<div class="row">
+		<div class="col-md-8 offset-md-2">
+			{% if messages %}
+				
+				    {% for message in messages %}
+				    <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+				    {{ message }}
+				    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    				<span aria-hidden="true">&times;</span>
+  					</button>
+					</div>
+				    
+				    {% endfor %}
+				
+			{% endif %}
+			
+			<!-- disable when it's not the owner -->
+			{% if request.user == poll.owner %}
+			<a 
+				href="{% url 'polls:add_choice' poll.id %}" 
+				class="btn btn-warning">
+				Add Choice 
+				<i class="fas fa-plus"></i>
+			</a>
+			{% endif %}
+
+
+			<form action="{% url 'polls:vote' poll.id %}" method="post">
+			{% csrf_token %}
+			
+			<div class="list-group">
+
+				{% for choice in poll.choice_set.all %}
+				<div class="list-group-item">
+					<input 
+						type="radio" 
+						name="choice" 
+						id="choice{{ forloop.counter }}" 
+						value="{{choice.id}}">
+					<label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label>
+				</div>	
+					
+				{% endfor %}
+				{% if not user_can_vote %}
+					{% for choice_dict in results %}
+					{{ choice_dict.text }}
+						<div class="progress mb-2 mt-2">
+		  					<div class="progress-bar" role="progressbar" style="width: {{choice_dict.percentage}}%;">{{choice_dict.num_votes}}
+		  					</div>
+						</div>
+					{% endfor %}
+				{% else %}
+					<p>Vote to see results!</p>
+				{% endif %}	
+			</div>
+
+			<input type="submit" value="Vote" class="btn btn-primary" {% if not user_can_vote %}disabled{% endif %}>
+		</div>
+	</div>
+	
+
+
+	
+	
+
+
+	</form>
+
+</div>
+
+
+{% endblock %}
